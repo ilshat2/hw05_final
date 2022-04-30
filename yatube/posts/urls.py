@@ -24,5 +24,4 @@ urlpatterns = [
         'profile/<str:username>/unfollow/',
         views.profile_unfollow,
         name='profile_unfollow'
-    ),
-]
+    ), ]
