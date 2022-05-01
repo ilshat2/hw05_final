@@ -16,7 +16,7 @@ def index(request: HttpRequest) -> HttpResponse:
     Возвращается Html-шаблон index.html.
     """
     title = 'Последние обновления на сайте'
-    post_list = Post.objects.all()
+    post_list = Post.objects.select_related('group')
     paginator = Paginator(post_list, settings.MAX)
     page_number = request.GET.get('page')
     page_obj = paginator.get_page(page_number)
@@ -176,8 +176,7 @@ def add_comment(request, post_id):
         comment.post = post
         comment.save()
     else:
-        context = {'form': form}
-        return render(request, 'posts/includes/comment.html', context)
+        return render(request, 'posts/includes/comment.html', {'form': form})
     return redirect('posts:post_detail', post_id=post_id)
 
 
@@ -209,5 +208,5 @@ def profile_unfollow(request, username):
     user = request.user
     author = get_object_or_404(User, username=username)
     if request.user != author:
-        Follow.objects.get(user=user, author__username=username).delete()
+        Follow.objects.filter(user=user, author=author).delete()
     return redirect('posts:profile', username=username)
